@@ -8,6 +8,8 @@ body {
     grid-template-columns: 80px repeat(5, 100px);
     gap: 2px;
     margin-top: 20px;
+
+	user-select: none;
 }
 
 #timetable > div {

@@ -1,4 +1,6 @@
 const timetable = document.getElementById("timetable");
+let isDragging = false;
+let dragMode = true;
 
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 
@@ -12,7 +14,7 @@ const times = [
 	"15:00", "15:30",
 	"16:00", "16:30",
 	"17:00", "17:30",
-	];
+];
 
 const corner = document.createElement("div");
 timetable.appendChild(corner);
@@ -24,17 +26,31 @@ for (const day of days) {
 }
 for (const time of times) {
 
-    const timeLabel = document.createElement("div");
-    timeLabel.textContent = time;
-    timetable.appendChild(timeLabel);
+	const timeLabel = document.createElement("div");
+	timeLabel.textContent = time;
+	timetable.appendChild(timeLabel);
 
-    for (const day of days) {
-        const cell = document.createElement("button");
+	for (const day of days) {
+		const cell = document.createElement("button");
 
-		cell.addEventListener("click", function() {
-			cell.calssList.toggle("selected");
-		});
-        timetable.appendChild(cell);
-    }
+		cell.addEventListener("mousedown", function() {
+				isDragging = true;
+
+				dragMode = !cell.classList.contains("selected");
+
+				cell.classList.toggle("selected", dragMode);
+				});
+
+		cell.addEventListener("mouseenter", function() {
+				if (isDragging) {
+				cell.classList.toggle("selected", dragMode);
+				}
+				});
+
+		timetable.appendChild(cell);
+	}
 }
 
+document.addEventListener("mouseup", function() {
+    isDragging = false;
+});
