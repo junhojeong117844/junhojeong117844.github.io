@@ -30,5 +30,5 @@ body {
     cursor: pointer;
 }
 #timetable >button.selected {
-	background-color: lightgray;
+	background-color: lightblue;
 }
