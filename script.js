@@ -1,3 +1,5 @@
+alert("script");
+
 const timetable = document.getElementById("timetable");
 
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
