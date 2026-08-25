@@ -14,3 +14,23 @@ const times = [
 	"17:00", "17:30",
 	];
 
+const corner = document.createElement("div");
+timetable.appendChild(corner);
+
+for (const day of days) {
+	const cell = document.createElement("div");
+	cell.textContent = day;
+	timetable.appendChild(cell);
+}
+for (const time of times) {
+
+    const timeLabel = document.createElement("div");
+    timeLabel.textContent = time;
+    timetable.appendChild(timeLabel);
+
+    for (const day of days) {
+        const cell = document.createElement("button");
+        timetable.appendChild(cell);
+    }
+}
+
