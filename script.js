@@ -30,6 +30,10 @@ for (const time of times) {
 
     for (const day of days) {
         const cell = document.createElement("button");
+
+		cell.addEventListener("click", function() {
+			cell.calssList.toggle("selected");
+		});
         timetable.appendChild(cell);
     }
 }
