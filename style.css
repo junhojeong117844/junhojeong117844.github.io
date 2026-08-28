@@ -15,8 +15,9 @@ body {
 }
 
 #logos img {
-    max-height: 45px;
+    height: 40px;
     width: auto;
+	object-fit: contain;
 }
 
 
@@ -80,7 +81,7 @@ body {
 
     grid-template-columns:
         80px
-        repeat(5, 110px);
+        repeat(5, 130px);
 
     gap: 0;
 
