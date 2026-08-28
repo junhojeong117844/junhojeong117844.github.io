@@ -1,3 +1,26 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+
+import {
+    getFirestore,
+    doc,
+    setDoc
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCDGkY9opb9Eypv0jg0Fq7976Ay_T1gNVE",
+    authDomain: "knu-hnpl.firebaseapp.com",
+    projectId: "knu-hnpl",
+    storageBucket: "knu-hnpl.firebasestorage.app",
+    messagingSenderId: "474040702069",
+    appId: "1:474040702069:web:809ced39b82478a4c6d43c",
+    measurementId: "G-HHNMDDY8ND"
+};
+
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const timetable = document.getElementById("timetable");
 let isDragging = false;
 let dragMode = true;
@@ -54,3 +77,4 @@ for (const time of times) {
 document.addEventListener("mouseup", function() {
     isDragging = false;
 });
+
