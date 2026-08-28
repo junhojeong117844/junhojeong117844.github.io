@@ -6,7 +6,8 @@ import {
     setDoc,
     getDoc,
     getDocs,
-    collection
+    collection,
+	deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 
@@ -149,7 +150,13 @@ function clearTimetable() {
     const cells = timetable.querySelectorAll("button");
 
     for (const cell of cells) {
-        cell.classList.remove("selected");
+        cell.classList.remove(
+		"selected",
+		"overlap-1",
+		"overlap-2",
+		"overlap-3",
+		"overlap-4"
+		);
     }
 }
 
@@ -230,8 +237,10 @@ async function drawSelectedSchedules() {
     editMode = false;
     currentUser = null;
 
-
     clearTimetable();
+
+
+    const counts = {};
 
 
     for (const name of selectedUsers) {
@@ -250,21 +259,37 @@ async function drawSelectedSchedules() {
             scheduleSnap.data().times ?? [];
 
 
-        const cells =
-            timetable.querySelectorAll("button");
+        for (const time of times) {
 
-
-        for (const cell of cells) {
-
-            if (times.includes(cell.dataset.cellId)) {
-
-                cell.classList.add("selected");
-
+            if (counts[time]) {
+                counts[time]++;
+            } else {
+                counts[time] = 1;
             }
         }
     }
-}
 
+
+    const cells =
+        timetable.querySelectorAll("button");
+
+
+    for (const cell of cells) {
+
+        const count =
+            counts[cell.dataset.cellId] ?? 0;
+
+
+        if (count > 0) {
+
+            const level = Math.min(count, 4);
+
+            cell.classList.add(
+                `overlap-${level}`
+            );
+        }
+    }
+}
 
 async function loadUserList() {
 
@@ -282,8 +307,18 @@ async function loadUserList() {
         const name = userDoc.id;
 
 
+        // 이름 + 삭제 버튼을 담는 한 줄
+        const row =
+            document.createElement("div");
+
+        row.className = "user-row";
+
+
+        // 이름 버튼
         const button =
             document.createElement("button");
+
+        button.className = "user-name";
 
 
         button.textContent =
@@ -318,10 +353,48 @@ async function loadUserList() {
         );
 
 
-        userList.appendChild(button);
+        // 삭제 버튼
+        const deleteButton =
+            document.createElement("button");
+
+        deleteButton.className = "delete-user";
+        deleteButton.textContent = "×";
+
+
+        deleteButton.addEventListener(
+            "click",
+            async function() {
+
+                const confirmed =
+                    confirm(
+                        `${name}의 시간표를 삭제하시겠습니까?`
+                    );
+
+
+                if (!confirmed) {
+                    return;
+                }
+
+
+                await deleteDoc(
+                    doc(db, "schedules", name)
+                );
+
+
+                selectedUsers.delete(name);
+
+                await drawSelectedSchedules();
+                await loadUserList();
+            }
+        );
+
+
+        row.appendChild(button);
+        row.appendChild(deleteButton);
+
+        userList.appendChild(row);
     }
 }
-
 
 createTimetable();
 
