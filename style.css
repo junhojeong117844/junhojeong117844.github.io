@@ -4,6 +4,21 @@ body {
     background-color: #ffffff;
 }
 
+#logos {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#logos img {
+    max-height: 45px;
+    width: auto;
+}
+
 
 /* 위쪽 입력 영역 */
 
@@ -53,6 +68,7 @@ body {
 	justify-content: left;
 
     gap: 15px;
+	overflow-x: auto;
 }
 
 
@@ -63,8 +79,8 @@ body {
     display: grid;
 
     grid-template-columns:
-        60px
-        repeat(5, 100px);
+        80px
+        repeat(5, 110px);
 
     gap: 0;
 
@@ -187,12 +203,13 @@ body {
 
 #userList {
     width: 100px;
+	flex-shrink: 0;
 
     display: flex;
     flex-direction: column;
 
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 4px;
 
     overflow: hidden;
 }
