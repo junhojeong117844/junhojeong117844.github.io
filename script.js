@@ -167,22 +167,18 @@ document.addEventListener("mouseup", function() {
 
 });
 
-
-editControls.addEventListener("submit", function(event) {
-
+editControls.addEventListener("submit", async function(event) {
     event.preventDefault();
 
-
     const name = nameInput.value.trim();
-
 
     if (name === "") {
         return;
     }
 
 
+    // 현재 화면 초기화
     clearTimetable();
-
     selectedUsers.clear();
 
 
@@ -190,9 +186,35 @@ editControls.addEventListener("submit", function(event) {
     editMode = true;
 
 
-    loadUserList();
-});
+    // Firestore에서 같은 이름의 시간표 확인
+    const scheduleSnap = await getDoc(
+        doc(db, "schedules", name)
+    );
 
+
+    // 기존 데이터가 있으면 시간표에 표시
+    if (scheduleSnap.exists()) {
+
+        const times =
+            scheduleSnap.data().times ?? [];
+
+
+        for (const time of times) {
+
+            const cell =
+                timetable.querySelector(
+                    `button[data-cell-id="${time}"]`
+                );
+
+            if (cell) {
+                cell.classList.add("selected");
+            }
+        }
+    }
+
+
+    await loadUserList();
+});
 
 finishButton.addEventListener("click", async function() {
 
