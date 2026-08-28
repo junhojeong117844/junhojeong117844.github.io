@@ -13,8 +13,17 @@
     <h1>Lab lecture timetable</h1>
     <p>this site made by J.Jeong</p>
     <p>this page will be design for HNPL timetable.</p>
-   
-    <div id="timetable"></div>
+  
+	<form id="editControls">
+    	<input id="nameInput" type="text" placeholder="이름 입력">
+    	<button id="editButton">시간표 수정</button>
+		    <button id="finishButton" type="button">수정 완료</button>
+	</form>
+
+	<div id="timetableArea">
+    	<div id="timetable"></div>
+    	<div id="userList"></div>
+	</div>
 
 	<script type="module" src="script.js"></script>
 </body>
