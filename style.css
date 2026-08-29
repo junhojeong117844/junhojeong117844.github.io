@@ -177,7 +177,7 @@ body {
 /* 선택된 30분 영역 */
 
 #timetable .hour-cell > button.selected {
-    background-color: lightyellow;
+    background-color: lightgreen;
 }
 
 /* 색 중첩 부분 */
