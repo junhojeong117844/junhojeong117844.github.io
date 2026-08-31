@@ -7,7 +7,7 @@ import {
     getDoc,
     getDocs,
     collection,
-	deleteDoc
+    deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 
@@ -151,12 +151,14 @@ function clearTimetable() {
 
     for (const cell of cells) {
         cell.classList.remove(
-		"selected",
-		"overlap-1",
-		"overlap-2",
-		"overlap-3",
-		"overlap-4"
-		);
+            "selected",
+            "overlap-1",
+            "overlap-2",
+            "overlap-3",
+            "overlap-4"
+        );
+
+        cell.textContent = "";
     }
 }
 
@@ -166,6 +168,7 @@ document.addEventListener("mouseup", function() {
     isDragging = false;
 
 });
+
 
 editControls.addEventListener("submit", async function(event) {
     event.preventDefault();
@@ -216,6 +219,7 @@ editControls.addEventListener("submit", async function(event) {
     await loadUserList();
 });
 
+
 finishButton.addEventListener("click", async function() {
 
     if (!editMode || currentUser === null) {
@@ -263,6 +267,7 @@ async function drawSelectedSchedules() {
 
 
     const counts = {};
+    const namesByTime = {};
 
 
     for (const name of selectedUsers) {
@@ -288,6 +293,12 @@ async function drawSelectedSchedules() {
             } else {
                 counts[time] = 1;
             }
+
+            if (namesByTime[time]) {
+                namesByTime[time].push(name);
+            } else {
+                namesByTime[time] = [name];
+            }
         }
     }
 
@@ -298,8 +309,10 @@ async function drawSelectedSchedules() {
 
     for (const cell of cells) {
 
+        const time = cell.dataset.cellId;
+
         const count =
-            counts[cell.dataset.cellId] ?? 0;
+            counts[time] ?? 0;
 
 
         if (count > 0) {
@@ -309,9 +322,27 @@ async function drawSelectedSchedules() {
             cell.classList.add(
                 `overlap-${level}`
             );
+
+
+            const names = namesByTime[time];
+            const lines = [];
+
+
+            // 한 줄에 최대 3명씩 표시
+            for (let i = 0; i < names.length; i += 3) {
+
+                lines.push(
+                    names.slice(i, i + 3).join(" ")
+                );
+            }
+
+
+            cell.textContent =
+                lines.join("\n");
         }
     }
 }
+
 
 async function loadUserList() {
 
@@ -417,6 +448,7 @@ async function loadUserList() {
         userList.appendChild(row);
     }
 }
+
 
 createTimetable();
 
