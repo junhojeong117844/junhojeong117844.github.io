@@ -6,29 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KNU HNPL</title>
 
-	<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <h1>HNPL timetable</h1>
- 
-	<div id="logos">
-    	<img src="images/knu_logo.png" alt="KNU Logo">
-    	<img src="images/hadron_vector.svg" alt="Lab Logo">
-	</div>
 
-	<form id="editControls">
-    	<input id="nameInput" type="text" placeholder="이름 입력">
-    	<button id="editButton">시간표 수정</button>
-		    <button id="finishButton" type="button">수정 완료</button>
-	</form>
+    <div id="logos">
+        <img src="images/knu_logo.png" alt="KNU Logo">
+        <img src="images/hadron_vector.svg" alt="Lab Logo">
+    </div>
 
-	<div id="timetableArea">
-    	<div id="timetable"></div>
-    	<div id="userList"></div>
-	</div>
+    <form id="editControls">
+        <input id="nameInput" type="text" placeholder="이름 입력">
+        <button id="editButton">시간표 수정</button>
+        <button id="finishButton" type="button">수정 완료</button>
+    </form>
 
-	<script type="module" src="script.js"></script>
+    <div id="tabControls">
+        <button id="timetableTab" class="tab-button active" type="button">Timetable</button>
+        <button id="meetingTab" class="tab-button" type="button">When to meet</button>
+    </div>
+
+    <section id="timetableView" class="tab-view active">
+        <div id="timetableArea">
+            <div id="timetable"></div>
+            <div id="userList"></div>
+        </div>
+    </section>
+
+    <section id="meetingView" class="tab-view">
+        <div id="meetingTimetable"></div>
+    </section>
+
+    <script type="module" src="script.js"></script>
 </body>
 
 <footer>

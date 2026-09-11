@@ -33,10 +33,17 @@ const finishButton = document.getElementById("finishButton");
 const timetable = document.getElementById("timetable");
 const userList = document.getElementById("userList");
 
+const timetableTab = document.getElementById("timetableTab");
+const meetingTab = document.getElementById("meetingTab");
+const timetableView = document.getElementById("timetableView");
+const meetingView = document.getElementById("meetingView");
+const meetingTimetable = document.getElementById("meetingTimetable");
+
 
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 
 const hours = [
+    "08:00",
     "09:00",
     "10:00",
     "11:00",
@@ -45,7 +52,11 @@ const hours = [
     "14:00",
     "15:00",
     "16:00",
-    "17:00"
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+    "21:00"
 ];
 
 
@@ -109,6 +120,7 @@ function createTimetable() {
 
         timeLabel.className = "time-label";
         timeLabel.textContent = hour;
+        timeLabel.dataset.hour = hour;
 
         timetable.appendChild(timeLabel);
 
@@ -118,6 +130,7 @@ function createTimetable() {
             const hourCell = document.createElement("div");
 
             hourCell.className = "hour-cell";
+            hourCell.dataset.hour = hour;
 
 
             const firstHalf = document.createElement("button");
@@ -142,6 +155,41 @@ function createTimetable() {
             timetable.appendChild(hourCell);
         }
     }
+}
+
+
+function setTimetableExtendedMode(isExtended) {
+
+    const visibleHours = isExtended
+        ? hours
+        : [
+            "09:00",
+            "10:00",
+            "11:00",
+            "12:00",
+            "13:00",
+            "14:00",
+            "15:00",
+            "16:00",
+            "17:00"
+        ];
+
+    const visibleSet = new Set(visibleHours);
+
+    const rows = timetable.querySelectorAll(
+        ".time-label, .hour-cell"
+    );
+
+    for (const row of rows) {
+        row.classList.toggle(
+            "hidden-hour",
+            !visibleSet.has(row.dataset.hour)
+        );
+    }
+
+    // 평소에는 기존 09:00~18:00 비율,
+    // 수정 중에는 08:00~22:00 전체를 같은 화면 높이에 맞춰 압축
+    timetable.classList.toggle("edit-extended", isExtended);
 }
 
 
@@ -187,6 +235,9 @@ editControls.addEventListener("submit", async function(event) {
 
     currentUser = name;
     editMode = true;
+
+    // 입력할 때만 08:00~21:30 전체 범위 표시
+    setTimetableExtendedMode(true);
 
 
     // Firestore에서 같은 이름의 시간표 확인
@@ -249,12 +300,19 @@ finishButton.addEventListener("click", async function() {
     editMode = false;
     currentUser = null;
 
+    // 평소 시간표는 09:00~17:30만 표시
+    setTimetableExtendedMode(false);
+
     nameInput.value = "";
 
 
     clearTimetable();
 
     await loadUserList();
+
+    if (meetingView.classList.contains("active")) {
+        await drawMeetingAvailability();
+    }
 });
 
 
@@ -263,6 +321,7 @@ async function drawSelectedSchedules() {
     editMode = false;
     currentUser = null;
 
+    setTimetableExtendedMode(false);
     clearTimetable();
 
 
@@ -342,6 +401,143 @@ async function drawSelectedSchedules() {
         }
     }
 }
+
+
+function createMeetingTimetable() {
+
+    meetingTimetable.innerHTML = "";
+
+    const corner = document.createElement("div");
+    corner.className = "meeting-header-cell";
+    meetingTimetable.appendChild(corner);
+
+    for (const day of days) {
+        const header = document.createElement("div");
+        header.className = "meeting-header-cell";
+        header.textContent = day;
+        meetingTimetable.appendChild(header);
+    }
+
+    for (const hour of hours) {
+
+        const timeLabel = document.createElement("div");
+        timeLabel.className = "meeting-time-label";
+        timeLabel.textContent = hour;
+        meetingTimetable.appendChild(timeLabel);
+
+        for (const day of days) {
+
+            const hourCell = document.createElement("div");
+            hourCell.className = "meeting-hour-cell";
+
+            const firstHalf = document.createElement("div");
+            firstHalf.className = "meeting-slot";
+            firstHalf.dataset.cellId = `${day}-${hour}`;
+
+            const secondHalf = document.createElement("div");
+            secondHalf.className = "meeting-slot";
+            secondHalf.dataset.cellId = `${day}-${hour.slice(0, 2)}:30`;
+
+            hourCell.appendChild(firstHalf);
+            hourCell.appendChild(secondHalf);
+            meetingTimetable.appendChild(hourCell);
+        }
+    }
+}
+
+
+async function drawMeetingAvailability() {
+
+    const querySnapshot = await getDocs(
+        collection(db, "schedules")
+    );
+
+    const totalUsers = querySnapshot.size;
+    const unavailableByTime = {};
+    const unavailableNamesByTime = {};
+
+    for (const userDoc of querySnapshot.docs) {
+
+        const name = userDoc.id;
+        const times = userDoc.data().times ?? [];
+
+        for (const time of times) {
+
+            unavailableByTime[time] =
+                (unavailableByTime[time] ?? 0) + 1;
+
+            if (unavailableNamesByTime[time]) {
+                unavailableNamesByTime[time].push(name);
+            } else {
+                unavailableNamesByTime[time] = [name];
+            }
+        }
+    }
+
+    const slots =
+        meetingTimetable.querySelectorAll(".meeting-slot");
+
+    for (const slot of slots) {
+
+        const time = slot.dataset.cellId;
+        const unavailable = unavailableByTime[time] ?? 0;
+        const available = Math.max(totalUsers - unavailable, 0);
+
+        slot.className = "meeting-slot";
+
+        if (totalUsers === 0) {
+            slot.textContent = "-";
+            slot.title = "저장된 시간표가 없습니다.";
+            continue;
+        }
+
+        slot.textContent = `${available}/${totalUsers}`;
+
+        const ratio = available / totalUsers;
+
+        // 가능 비율을 0~10 단계로 표시
+        // 0 = 모두 불가능, 10 = 모두 가능
+        const level = Math.min(
+            10,
+            Math.max(0, Math.round(ratio * 10))
+        );
+
+        slot.classList.add(`availability-${level}`);
+
+        const unavailableNames =
+            unavailableNamesByTime[time] ?? [];
+
+        slot.title = unavailableNames.length > 0
+            ? `Unavailable: ${unavailableNames.join(", ")}`
+            : "Everyone available";
+    }
+}
+
+
+async function showTimetableTab() {
+
+    timetableTab.classList.add("active");
+    meetingTab.classList.remove("active");
+
+    timetableView.classList.add("active");
+    meetingView.classList.remove("active");
+}
+
+
+async function showMeetingTab() {
+
+    timetableTab.classList.remove("active");
+    meetingTab.classList.add("active");
+
+    timetableView.classList.remove("active");
+    meetingView.classList.add("active");
+
+    await drawMeetingAvailability();
+}
+
+
+timetableTab.addEventListener("click", showTimetableTab);
+meetingTab.addEventListener("click", showMeetingTab);
 
 
 async function loadUserList() {
@@ -438,6 +634,10 @@ async function loadUserList() {
 
                 await drawSelectedSchedules();
                 await loadUserList();
+
+                if (meetingView.classList.contains("active")) {
+                    await drawMeetingAvailability();
+                }
             }
         );
 
@@ -451,5 +651,7 @@ async function loadUserList() {
 
 
 createTimetable();
+setTimetableExtendedMode(false);
+createMeetingTimetable();
 
 loadUserList();

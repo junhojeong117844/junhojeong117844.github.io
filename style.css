@@ -93,6 +93,17 @@ body {
     border-left: 1px solid #ddd;
 }
 
+/* 평소 시간표에서는 09:00~18:00 범위만 보이게 함 */
+#timetable .hidden-hour {
+    display: none !important;
+}
+
+/* 수정 모드에서만 08:00~22:00 전체를 압축해서 표시 */
+#timetable.edit-extended .time-label,
+#timetable.edit-extended .hour-cell {
+    height: 51.43px;
+}
+
 
 
 /* 요일 제목 */
@@ -291,3 +302,170 @@ body {
 .delete-user:hover {
     background-color: #f5f5f5;
 }
+
+
+/* 탭 */
+
+#tabControls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.tab-button {
+    height: 36px;
+    padding: 0 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.tab-button.active {
+    background-color: #222;
+    color: white;
+    border-color: #222;
+}
+
+.tab-view {
+    display: none;
+}
+
+.tab-view.active {
+    display: block;
+}
+
+
+/* When to meet */
+
+#meetingView {
+    overflow-x: auto;
+}
+
+#meetingTimetable {
+    display: grid;
+    grid-template-columns:
+        80px
+        repeat(5, 110px);
+
+    gap: 0;
+    width: max-content;
+
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+
+    user-select: none;
+}
+
+#meetingTimetable .meeting-header-cell {
+    height: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+
+    background-color: white;
+
+    font-size: 10px;
+}
+
+#meetingTimetable .meeting-time-label {
+    height: 51.43px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: right;
+
+    box-sizing: border-box;
+
+    padding-top: 5px;
+    padding-right: 5px;
+
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+
+    background-color: white;
+
+    font-size: 10px;
+}
+
+#meetingTimetable .meeting-hour-cell {
+    height: 51.43px;
+
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+
+    box-sizing: border-box;
+
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+#meetingTimetable .meeting-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+
+    box-sizing: border-box;
+
+    font-size: 9px;
+    line-height: 1;
+    font-weight: 600;
+}
+
+#meetingTimetable .availability-0 {
+    background-color: #d73027;
+    color: white;
+}
+
+#meetingTimetable .availability-1 {
+    background-color: #e34a33;
+    color: white;
+}
+
+#meetingTimetable .availability-2 {
+    background-color: #f46d43;
+}
+
+#meetingTimetable .availability-3 {
+    background-color: #fdae61;
+}
+
+#meetingTimetable .availability-4 {
+    background-color: #fee08b;
+}
+
+#meetingTimetable .availability-5 {
+    background-color: #ffffbf;
+}
+
+#meetingTimetable .availability-6 {
+    background-color: #d9ef8b;
+}
+
+#meetingTimetable .availability-7 {
+    background-color: #a6d96a;
+}
+
+#meetingTimetable .availability-8 {
+    background-color: #66bd63;
+}
+
+#meetingTimetable .availability-9 {
+    background-color: #1a9850;
+    color: white;
+}
+
+#meetingTimetable .availability-10 {
+    background-color: #006837;
+    color: white;
+}
+
